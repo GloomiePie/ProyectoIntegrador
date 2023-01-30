@@ -2,72 +2,46 @@ import com.github.tototoshi.csv._
 import java.io.File
 
 object Main3 extends App{
-  val reader = CSVReader.open(new File("C:\\Users\\USUARIO\\Downloads\\movie_dataset.csv"))
+  val reader = CSVReader.open(new File("C:\\Users\\SALA A\\Desktop\\movie_dataset.csv"))
   val data = reader.allWithHeaders()
   reader.close()
 
+  //////////////////////////////////
   println("Columna genres")
   val generos = data
     .flatMap(elem => elem.get("genres"))
 
-  printf("la columna genres tiene %s filas con carácteres\n\n", generos.filter(x => x != " ")
-    .count(x => x != ""))
+  generos.map(x => x.replace(" ", ","))
+  val generoMax = generos.groupBy(x => x).toList.maxBy(_._2.size)._2.size
+  val nomGeneroMax = generos.groupBy(x => x).toList.maxBy(_._2.size)._1
+  val generoMin = generos.groupBy(x => x).toList.minBy(_._2.size)._2.size
+  val nomGeneroMin = generos.groupBy(x => x).toList.minBy(_._2.size)._1
+  val sinGenero = generos.groupBy(x => x).toList.filter(_._1.isEmpty).maxBy(_._2.size)._2.size
+  println("El genero que más se repite es " + nomGeneroMax + " y se repite " + generoMax + " veces")
+  println("El genero que menos se repite es " + nomGeneroMin + " y se repite " + generoMin + " veces")
+  println("Existen en total " + sinGenero + " peliculas sin genro")
 
-  println("Columna homepage")
-  val url = data
-    .flatMap(elem => elem.get("homepage"))
-
-  printf("la columna homepage tiene %s filas con carácteres\n\n", url.filter(x => x != " ")
-    .count(x => x != ""))
-
-  println("Columna keywords")
-  val clave = data
-    .flatMap(elem => elem.get("keywords"))
-
-  printf("la columna keywords tiene %s filas con carácteres\n\n", clave.filter(x => x != " ")
-    .count(x => x != ""))
-
-  println("Columna original_language")
+  //////////////////////////////////
+  println("\nColumna original_language")
   val original = data
     .flatMap(elem => elem.get("original_language"))
 
-  printf("la columna original_languajes tiene %s filas " +
-    "con el carácter 'en'\n", original.filter(x => x == "en")
-    .count(x => x != ""))
+  val languagesMax = original.groupBy(x => x).toList.maxBy(_._2.size)._2.size
+  val nomlanguagesMax = original.groupBy(x => x).toList.maxBy(_._2.size)._1
+  val languagesMin = original.groupBy(x => x).toList.minBy(_._2.size)._2.size
+  val nomlanguagesMin = original.groupBy(x => x).toList.minBy(_._2.size)._1
+  println("El Lenguaje Original que más se repite es " + nomlanguagesMax.toUpperCase() + " y se repite " + languagesMax + " veces")
+  println("El Lenguaje Original que menos se repite es " + nomlanguagesMin.toUpperCase() + " y se repite " + languagesMin + " veces")
 
-  printf("la columna original_languajes tiene %s filas " +
-    "con el carácter 'es'\n", original.filter(x => x == "es")
-    .count(x => x != ""))
-
-  printf("la columna original_languajes tiene %s filas " +
-    "con el carácter 'fr'\n", original.filter(x => x == "fr")
-    .count(x => x != ""))
-
-  printf("la columna original_languajes tiene %s filas " +
-    "con el carácter 'ja'\n", original.filter(x => x == "ja")
-    .count(x => x != ""))
-
-  printf("la columna original_languajes tiene %s filas " +
-    "con el carácter 'ru'\n", original.filter(x => x == "ru")
-    .count(x => x != ""))
-
-  printf("la columna original_languajes tiene %s filas " +
-    "con el carácter 'ko'\n\n", original.filter(x => x == "ko")
-    .count(x => x != ""))
-
-  println("Columna status")
+  //////////////////////////////////
+  println("\nColumna status")
   val estado = data
     .flatMap(elem => elem.get("status"))
 
-  printf("la columna status tiene %s filas " +
-    "con el carácter 'Released'\n", estado.filter(x => x == "Released")
-    .count(x => x != ""))
-
-  printf("la columna status tiene %s filas " +
-    "con el carácter 'Post Production'\n", estado.filter(x => x == "Post Production")
-    .count(x => x != ""))
-
-  printf("la columna status tiene %s filas " +
-    "con el carácter 'Rumored'\n", estado.filter(x => x == "Rumored")
-    .count(x => x != ""))
+  val statusMax = estado.groupBy(x => x).toList.maxBy(_._2.size)._2.size
+  val nomstatusMax = estado.groupBy(x => x).toList.maxBy(_._2.size)._1
+  val statusMin = estado.groupBy(x => x).toList.minBy(_._2.size)._2.size
+  val nomstatusMin = estado.groupBy(x => x).toList.minBy(_._2.size)._1
+  println("Hay " + statusMax + " peliculas en estado " + nomstatusMax)
+  println("Hay " + statusMin + " peliculas en estado " + nomstatusMin)
 }
