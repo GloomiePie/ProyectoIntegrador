@@ -6,6 +6,9 @@ import java.io.File
 import com.cibo.evilplot.plot._
 import com.cibo.evilplot.plot.aesthetics.DefaultTheme._
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 object Main3 extends App{
   val reader = CSVReader.open(new File("C:\\Users\\CM\\movie_dataset.csv"))
   val data = reader.allWithHeaders()
@@ -89,4 +92,58 @@ object Main3 extends App{
     .bottomLegend()
     .render()
     .write(new File("C:\\Users\\CM\\Desktop\\status.png"))
+
+  //////////////////////////////////
+  println("\nColumna Overview")
+  val overview = data
+    .flatMap(elem => elem.get("overview"))
+
+  val sinOverview = overview.groupBy(x => x).toList.filter(_._1.isEmpty).maxBy(_._2.size)._2.size
+  println("Existen en total " + sinOverview + " peliculas que no tienen Overview")
+
+  //////////////////////////////////
+  println("\nColumna Homepage")
+  val homepage = data
+    .flatMap(elem => elem.get("homepage"))
+
+  val sinHomepage = homepage.groupBy(x => x).toList.filter(_._1.isEmpty).maxBy(_._2.size)._2.size
+  println("Existen un total de " + sinHomepage + " peliculas que no tienen registrados un Homepage")
+
+  //////////////////////////////////
+  println("\nColumna Keywords")
+  val keywords = data
+    .flatMap(elem => elem.get("keywords"))
+
+  val sinKeywords = keywords.groupBy(x => x).toList.filter(_._1.isEmpty).maxBy(_._2.size)._2.size
+  println(sinKeywords + " peliculas que no poseen Keywords")
+
+  //////////////////////////////////
+  println("\nColumna Tagline")
+  val tagline = data
+    .flatMap(elem => elem.get("tagline"))
+  val sinTagline = tagline.groupBy(x => x).toList.filter(_._1.isEmpty).maxBy(_._2.size)._2.size
+  println(sinTagline + " peliculas no han registrado su Tagline")
+
+  //////////////////////////////////
+  println("\nColumna Release_Date")
+  val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+  val releaseDate = data
+    .map(elem => elem("release_date"))
+    .filter(!_.equals(""))
+    .map(text => LocalDate.parse(text, dateFormatter))
+
+  val yearReleaseDate = releaseDate
+    .map(_.getYear)
+    .map(_.toDouble)
+
+  printf("La pelicula más antigua registrada es del año %.0f\n", yearReleaseDate.min)
+  printf("La pelicula mas reciente registrada es del año %.0f\n", yearReleaseDate.max)
+
+  Histogram(yearReleaseDate)
+    .title("Años de Lanzamiento")
+    .xAxis()
+    .yAxis()
+    .xbounds(1916.0, 2018.0)
+    .render()
+    .write(new File("C:\\Users\\CM\\Desktop\\añosLanzamiento.png"))
 }
