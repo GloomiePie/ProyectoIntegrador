@@ -68,7 +68,7 @@ object ScripTablaUnivesal extends App{
     )
 
   val SQL_INSERT_PATTERN =
-    """INSERT INTO MOVIE (`index`, budget, homepage, id, original_language, original_title, overview, popularity, release_date, revenue, runtime, status, tagline, title, vote_average, vote_count, director  )
+    """INSERT INTO Movie (`index`, budget, homepage, id, original_language, original_title, overview, popularity, release_date, revenue, runtime, status, tagline, title, vote_average, vote_count, director  )
       |VALUES
       |('%d', '%d', '%s', '%d' , '%s', '%s', '%s', '%f', '%s', '%d', '%f', '%s', '%s', '%s', '%f', '%d', '%s');
       |""".stripMargin
