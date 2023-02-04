@@ -1,6 +1,5 @@
 import com.cibo.evilplot.plot._
 import com.cibo.evilplot.plot.aesthetics.DefaultTheme._
-
 import com.github.tototoshi.csv.CSVReader
 
 import java.io.File
@@ -21,12 +20,11 @@ object AnalisisNumerico extends App{
   printf("El presupuesto promedio es: $%.2f\n", presupuesto.map(x => x.toDouble).sum
     / presupuesto.size) //Conseguir el promedio
 
-  val budget: Seq[Double] = Seq(presupuesto.maxBy(x => x.toDouble).toDouble,
-    presupuesto.minBy(x => x.toDouble).toDouble,
-    presupuesto.filter(x => x != "0").minBy(x => x.toDouble).toDouble, (presupuesto.map(x => x.toDouble).sum
-      / presupuesto.size).toDouble)
+  val budget: Seq[Double] = Seq(presupuesto.count(_ == "0").toDouble/1000,//cuantos valores nulos hay
+    presupuesto.count(x => x.toDouble < 10000).toDouble/1000,//cuantos presupuestos estan por debajo de los 1000 dolares
+    presupuesto.count(x => x.toDouble > 10000000).toDouble/1000, 0)//cuantos presupuestos estan por encima del 1000000
 
-  val medidas = List("Máximo", "Mínimo", "Mínimo sin 0", "Promedio")
+  val medidas = List("Cantidad nulos", "Inferiores a 1000$", "Superiores a 1000000$")
 
   BarChart(budget)
     .title("Datos descriptivos")
@@ -50,48 +48,47 @@ object AnalisisNumerico extends App{
   printf("La popularidad promedio es: %.2f\n", popularidad.map(x => x.toDouble).sum
     / popularidad.size) //Conseguir el promedio
 
-  val popularity : Seq[Double] = Seq(popularidad.maxBy(x => x.toDouble).toDouble,
-    popularidad.minBy(x => x.toDouble).toDouble,
-    popularidad.filter(x => !x.equals("0.0")).minBy(x => x.toDouble).toDouble,
-    popularidad.map(x => x.toDouble).sum / popularidad.size)
+  val popularity : Seq[(String,Double)] = Seq(("Valores mayores a 500" ->
+    popularidad.count(_ > "500")), //cuantos valores mayores a 500 hay
+    ("Valores mayores al promedio"->
+      popularidad.count(x => x.toDouble >= (x.map(_.toDouble).sum/x.size)).toDouble) //cauntos valores superan el promedio
+  )
 
-  BarChart(popularity)
+  PieChart(popularity)
     .title("Datos descriptivos")
-    .xAxis(medidas)
-    .yAxis()
-    .frame()
-    .yLabel("POPULARITY")
-    .bottomLegend()
+    .rightLegend()
     .render()
     .write(new File("C:\\Users\\USUARIO\\Downloads\\popularity.png"))
   println("Gráfico generado\n")
 
   // Columna revenue
   println("Columna revenue")
-  val ganacias = data
+  val ganancias = data
     .flatMap(elem => elem.get("revenue"))
 
-  printf("La ganacia más alto es: $%s\n", ganacias.maxBy(x => x.toDouble)) //Conseguir la mayor ganacia
-  printf("La ganacia más bajo es: $%s\n", ganacias.minBy(x => x.toDouble)) //Conseguir la menor ganacia
-  printf("La ganacia más bajo sin 0 es: $%s\n", ganacias.filter(x => !x.equals("0")).minBy(x => x.toDouble)) //Conseguir la menor ganacia sin 0
-  printf("La ganacia promedio es: $%.2f\n", ganacias.map(x => x.toDouble).sum
-    / ganacias.size) //Conseguir el promedio
+  printf("La ganancia más alto es: $%s\n", ganancias.maxBy(x => x.toDouble)) //Conseguir la mayor ganacia
+  printf("La ganancia más bajo es: $%s\n", ganancias.minBy(x => x.toDouble)) //Conseguir la menor ganacia
+  printf("La ganancia más bajo sin 0 es: $%s\n", ganancias.filter(x => !x.equals("0")).minBy(x => x.toDouble)) //Conseguir la menor ganacia sin 0
+  printf("La ganancia promedio es: $%.2f\n", ganancias.map(x => x.toDouble).sum
+    / ganancias.size) //Conseguir el promedio
 
-  val revenue: Seq[Double] = Seq(ganacias.maxBy(x => x.toDouble).toDouble,
-    ganacias.minBy(x => x.toDouble).toDouble,
-    ganacias.filter(x => !x.equals("0")).minBy(x => x.toDouble).toDouble,
-    ganacias.map(x => x.toDouble).sum / ganacias.size)
+  println(ganancias.count(x => x.toDouble >= (x.map(_.toDouble).sum/x.size)).toDouble/1000)
+  println( presupuesto.count(_ == "0").toDouble/1000)
 
+  val revenue: Seq[Double] = Seq(ganancias.count(x => x.toDouble >= (x.map(_.toDouble).sum/x.size)).toDouble/1000,
+    presupuesto.count(_ == "0").toDouble/1000, 0)
+
+  val revenue1 = List("Valores mayor al promedio", "Valores igual a 0")
   BarChart(revenue)
     .title("Datos descriptivos")
-    .xAxis(medidas)
+    .xAxis(revenue1)
     .yAxis()
     .frame()
     .yLabel("REVENUE")
     .bottomLegend()
     .render()
     .write(new File("C:\\Users\\USUARIO\\Downloads\\revenue.png"))
-  println("Gráfico generado")
+  println("Gráfico generado\n")
 
   // Columna vote average
   println("Columna vote average")
@@ -104,21 +101,17 @@ object AnalisisNumerico extends App{
   printf("El promedio es: %.2f\n", promedio.map(x => x.toDouble).sum
     / promedio.size) //Conseguir el promedio
 
-  val vote_average: Seq[Double] = Seq(promedio.maxBy(x => x.toDouble).toDouble,
-    promedio.minBy(x => x.toDouble).toDouble,
-    promedio.filter(x => !x.equals("0.0")).minBy(x => x.toDouble).toDouble,
-    promedio.map(x => x.toDouble).sum / promedio.size)
+  val vote_average: Seq[(String, Double)] = Seq(("valores mayor a 8.0" -> promedio.count(x => x >= "8.0").toDouble), //valores mayor a 8.0
+    ("valores menores a 4.7" -> promedio.count(x => x <= "4.7" ).toDouble),//valores menores a 4.7
+   ("valores igual a 5.0" -> promedio.count(_.equals("5.0")).toDouble), //valores igual a 5.0
+  )
 
-  BarChart(vote_average)
+  PieChart(vote_average)
     .title("Datos descriptivos")
-    .xAxis(medidas)
-    .yAxis()
-    .frame()
-    .yLabel("VOTE AVERAGE")
-    .bottomLegend()
+    .rightLegend()
     .render()
     .write(new File("C:\\Users\\USUARIO\\Downloads\\vote_average.png"))
-  println("Gráfico generado")
+  println("Gráfico generado\n")
 
   // Columna vote count
   println("Columna vote average")
@@ -130,17 +123,13 @@ object AnalisisNumerico extends App{
   printf("El voto promedio es: %.2f\n", votos.map(x => x.toDouble).sum
     / votos.size) //Conseguir el promedio
 
-  val vote_count: Seq[Double] = Seq(votos.maxBy(x => x.toInt).toDouble,
-    votos.minBy(x => x.toInt).toDouble, votos.map(x => x.toDouble).sum
-      / votos.size)
-  val medidas2 = List("Máximo", "Mínimo", "Promedio")
-  BarChart(vote_average)
+  val vote_count: Seq[(String ,Double)] = Seq(("valores igual a 0" -> votos.count(_ <= "1700").toDouble/1000), //valores igual a 0
+    ("valores mayores a 1200" -> votos.count(_ >= "1200").toDouble/1000), //valores mayores a 1200
+    "valores igual a 1200" -> votos.count(x => x >= (x.map(_.toDouble).sum/x.size).toString)/1000//valores igual a 1200
+  )
+  PieChart(vote_count)
     .title("Datos descriptivos")
-    .xAxis(medidas2)
-    .yAxis()
-    .frame()
-    .yLabel("VOTE COUNT")
-    .bottomLegend()
+    .rightLegend()
     .render()
     .write(new File("C:\\Users\\USUARIO\\Downloads\\vote_count.png"))
   println("Gráfico generado")
