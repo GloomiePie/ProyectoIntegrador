@@ -23,7 +23,7 @@ object ScripTablaUnivesal extends App{
     .replaceAll("\"", "\\\\\"")
 
   case class Movie(
-                  index: Int,
+                  index: Long,
                   budget: Long,
                   homepage: String,
                   id: Int,
@@ -44,7 +44,7 @@ object ScripTablaUnivesal extends App{
 
   val movieData = data
     .map(row => Movie(
-      row("index").toInt,
+      row("index").toLong,
       row("budget").toLong,
       row("homepage"),
       row("id").toInt,
