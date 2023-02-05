@@ -1,20 +1,22 @@
+package ProyectoIntegrador
+
 import java.io.File
 import com.github.tototoshi.csv.CSVReader
 import io.circe.JsonObject
 import scalikejdbc._
 import play.api.libs.json._
-import requests.{Response, readTimeout}
+import requests.Response
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Success, Try}
 import scala.util.matching.Regex
 
 object SentenciasInsertInto extends App {
-  val reader = CSVReader.open(new File("C:\\Users\\USUARIO\\Downloads\\movie_dataset.csv"))
+  val reader = CSVReader.open(new File("C:\\Users\\CM\\movie_dataset.csv"))
   val data = reader.allWithHeaders()
   reader.close()
 
   Class.forName("com.mysql.cj.jdbc.Driver")
-  ConnectionPool.singleton("jdbc:mysql://localhost:3306/ProyectoIntegrador", "root", "29122003g?")
+  ConnectionPool.singleton("jdbc:mysql://localhost:3306/ProyectoIntegrador", "root", "nomeacuerdo")
   implicit val session: DBSession = AutoSession
 
   //COLUMNA GENRES - Pasado A Base De Datos
@@ -25,9 +27,10 @@ object SentenciasInsertInto extends App {
     .flatMap(x => x._2.map((x._1, _)))
     .map(x => (x._1.toInt, x._2))
     .sortBy(_._1)
+
     generos.map(elem =>
     sql"""
-         |INSERT INTO Genres (idMovie, name)
+         |INSERT INTO genres(idMovie, name)
          |VALUES
          |(${elem._1}, ${elem._2})
                """.stripMargin
@@ -35,13 +38,14 @@ object SentenciasInsertInto extends App {
       .apply())*/
 
   //COLUMNA CAST - Pasado A Base De Datos
-  val cast = data
+  /*val cast = data
     .map(elem => (elem("id"), elem("cast")))
     .filter(_._2.nonEmpty)
     .map(x => (x._1, x._2.split(" ")))
     .flatMap(x => x._2.map((x._1, _)))
     .map(x => (x._1.toInt, x._2))
     .sortBy(_._1)
+
   cast.map(elem =>
     sql"""
          |INSERT INTO Cast (idMovie, Name)
@@ -49,16 +53,17 @@ object SentenciasInsertInto extends App {
          |(${elem._1}, ${elem._2})
                  """.stripMargin
       .update
-      .apply())
+      .apply())*/
 
-  //COLUMNA KEYWORDS - Pasado a base de datos
-  val claves = data
+  //COLUMNA KEYWORDS
+  /*val claves = data
     .map(elem => (elem("id"), elem("keywords")))
     .filter(_._2.nonEmpty)
     .map(x => (x._1, x._2.split(" ")))
     .flatMap(x => x._2.map((x._1, _)))
     .map(x => (x._1.toInt, x._2))
     .sortBy(_._1)
+
   claves.map(elem =>
     sql"""
          |INSERT INTO Keywords (idMovie, Name)
@@ -66,12 +71,14 @@ object SentenciasInsertInto extends App {
          |(${elem._1}, ${elem._2})
                    """.stripMargin
       .update
-      .apply())
+      .apply())*/
 
   //COLUMNA production_companies
   /*val productionCompanies = data
     .map(elem => (elem("id"), elem("production_companies")))
+
   println(productionCompanies)
+
   productionCompanies.map(elem =>
     sql"""
          |INSERT INTO production_companies (idMovie, name, idCompany)
@@ -81,10 +88,12 @@ object SentenciasInsertInto extends App {
       .update
       .apply())*/
 
-  //COLUMNA production_countries
+   //COLUMNA production_countries
   /*val productionCountries = data
     .map(elem => (elem("id"), elem("production_countries")))
+
   println(productionCountries)
+
   productionCountries.map(elem =>
     sql"""
          |INSERT INTO production_countries (idMovie, name, `iso_3166_1`)
@@ -97,7 +106,9 @@ object SentenciasInsertInto extends App {
   //COLUMNA spoken_language
   /*val spoken_language = data
     .map(elem => (elem("id"), elem("spoken_languages")))
+
   println(spoken_language)
+
   spoken_language.map(elem =>
     sql"""
          |INSERT INTO spoken_language (idMovie, `iso_639_1`, name)
@@ -107,6 +118,7 @@ object SentenciasInsertInto extends App {
       .update
       .apply())*/
 
+  //COLUMNA Crew
   val pattern1 = "(\\s\"(.*?)\",)".r
   val pattern2 = "([a-z]\\s\"(.*?)\"\\s*[A-Z])".r
   val pattern3 = "(:\\s'\"(.*?)',)".r
@@ -133,24 +145,24 @@ object SentenciasInsertInto extends App {
     .map(elem => (elem("id") ->
       elem("crew")))
     .map(_._2)
-      .map(text => replacePattern4(text, pattern2))
-      .map(text => replacePattern4(text, pattern1))
-      .map(text => replacePattern4(text, pattern3))
-      .map(text => text.replace("'", "\""))
-      .map(text => text.replace("-u0027", "'"))
-      .map(text => text.replace("-u0022", "\\\""))
-      .map(text => Try(Json.parse(text)) match {
-        case Success(i) => i
-      })
-      .flatMap(_.as[List[JsValue]])
-      .map(x => (x("name").as[String],
-        x("gender").as[Int],
-        x("department").as[String],
-        x("job").as[String],
-        x("credit_id").as[String],
-        x("id").as[Int]))
+    .map(text => replacePattern4(text, pattern2))
+    .map(text => replacePattern4(text, pattern1))
+    .map(text => replacePattern4(text, pattern3))
+    .map(text => text.replace("'", "\""))
+    .map(text => text.replace("-u0027", "'"))
+    .map(text => text.replace("-u0022", "\\\""))
+    .map(text => Try(Json.parse(text)) match {
+      case Success(i) => i
+    })
+    .flatMap(_.as[List[JsValue]])
+    .map(x => (x("name").as[String],
+      x("gender").as[Int],
+      x("department").as[String],
+      x("job").as[String],
+      x("credit_id").as[String],
+      x("id").as[Int]))
 
-  println(crew)
+  print(crew)
   /*idMovieCrew.map(elem =>
     sql"""
          |INSERT INTO Crew (idMovie, id, name, gender, departament, job, credit_id)
