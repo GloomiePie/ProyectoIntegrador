@@ -22,16 +22,17 @@ object AnalisisNumerico extends App{
 
   val budget: Seq[Double] = Seq(presupuesto.count(_ == "0").toDouble/1000,//cuantos valores nulos hay
     presupuesto.count(x => x.toDouble < 10000).toDouble/1000,//cuantos presupuestos estan por debajo de los 1000 dolares
-    presupuesto.count(x => x.toDouble > 10000000).toDouble/1000, 0)//cuantos presupuestos estan por encima del 1000000
+    presupuesto.count(x => x.toDouble > 10000000).toDouble/1000, //cuantos presupuestos estan por encima del 1000000
+    0)
 
   val medidas = List("Cantidad nulos", "Inferiores a 1000$", "Superiores a 1000000$")
 
   BarChart(budget)
-    .title("Datos descriptivos")
+    .title("Datos descriptivos representación logarítmica (1000)")
     .xAxis(medidas)
     .yAxis()
     .frame()
-    .yLabel("BUDGET")
+    .yLabel("BUDGET EN BASE 10")
     .bottomLegend()
     .render()
     .write(new File("C:\\Users\\USUARIO\\Downloads\\budget.png"))
@@ -48,8 +49,8 @@ object AnalisisNumerico extends App{
   printf("La popularidad promedio es: %.2f\n", popularidad.map(x => x.toDouble).sum
     / popularidad.size) //Conseguir el promedio
 
-  val popularity : Seq[(String,Double)] = Seq(("Valores mayores a 500" ->
-    popularidad.count(_ > "500")), //cuantos valores mayores a 500 hay
+  val popularity : Seq[(String, Double)] = Seq("Valores mayores a 500" ->
+    popularidad.count(_ > "500"), //cuantos valores mayores a 500 hay
     ("Valores mayores al promedio"->
       popularidad.count(x => x.toDouble >= (x.map(_.toDouble).sum/x.size)).toDouble) //cauntos valores superan el promedio
   )
@@ -72,9 +73,6 @@ object AnalisisNumerico extends App{
   printf("La ganancia promedio es: $%.2f\n", ganancias.map(x => x.toDouble).sum
     / ganancias.size) //Conseguir el promedio
 
-  println(ganancias.count(x => x.toDouble >= (x.map(_.toDouble).sum/x.size)).toDouble/1000)
-  println( presupuesto.count(_ == "0").toDouble/1000)
-
   val revenue: Seq[Double] = Seq(ganancias.count(x => x.toDouble >= (x.map(_.toDouble).sum/x.size)).toDouble/1000,
     presupuesto.count(_ == "0").toDouble/1000, 0)
 
@@ -84,7 +82,7 @@ object AnalisisNumerico extends App{
     .xAxis(revenue1)
     .yAxis()
     .frame()
-    .yLabel("REVENUE")
+    .yLabel("REVENUE EN BASE 10")
     .bottomLegend()
     .render()
     .write(new File("C:\\Users\\USUARIO\\Downloads\\revenue.png"))
@@ -101,7 +99,7 @@ object AnalisisNumerico extends App{
   printf("El promedio es: %.2f\n", promedio.map(x => x.toDouble).sum
     / promedio.size) //Conseguir el promedio
 
-  val vote_average: Seq[(String, Double)] = Seq(("valores mayor a 8.0" -> promedio.count(x => x >= "8.0").toDouble), //valores mayor a 8.0
+  val vote_average: Seq[(String, Double)] = Seq(("valores mayor a 8.0" -> promedio.count(x => x > "8.0").toDouble), //valores mayor a 8.0
     ("valores menores a 4.7" -> promedio.count(x => x <= "4.7" ).toDouble),//valores menores a 4.7
    ("valores igual a 5.0" -> promedio.count(_.equals("5.0")).toDouble), //valores igual a 5.0
   )
@@ -114,7 +112,7 @@ object AnalisisNumerico extends App{
   println("Gráfico generado\n")
 
   // Columna vote count
-  println("Columna vote average")
+  println("Columna vote count")
   val votos = data
     .flatMap(elem => elem.get("vote_count"))
 
